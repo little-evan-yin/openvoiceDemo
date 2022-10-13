@@ -25,14 +25,14 @@ contract OpenVoiceNFT is ERC2981, ERC721AURIStorage {
         _safeMint(msg.sender, quantity);   
     }
 
-    function mintWithTokenURIAndRoyalty(uint256 quantity, string[] memory tokenURI, uint96 feeNumerator) public {
+    function mintWithTokenURIAndRoyalty(uint256 quantity, string[] memory tokenURI, address royaltyReceiver, uint96 feeNumerator) public {
         uint256 startTokenId = _nextTokenId();
         uint256 end = startTokenId + quantity;
 
         _safeMint(msg.sender, quantity);
         // update this tokens royalty info    
         for (uint256 tokenId=startTokenId; tokenId < end; tokenId++) {
-            _setTokenRoyalty(tokenId, msg.sender, feeNumerator);
+            _setTokenRoyalty(tokenId, royaltyReceiver, feeNumerator);
             _setTokenURI(tokenId, tokenURI[tokenId - startTokenId]);
         }
     }
