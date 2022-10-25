@@ -44,15 +44,15 @@ async function main() {
     const res = await axios(options);
     console.log(res.data);
 
-    const tokenURI = res.data[0].path
+    const tokenURI = res.data[0].path;
     // 2. 铸造（绑定tokenID 和 tokenURI）
     await nft.mintWithTokenURIAndRoyalty(1, [tokenURI], 100);
 
     // 3. 转移
-    const to = "0xeDeEC68103C5A23f7B9bFa6844Bd2435f9124790"
+    const to = "0xeDeEC68103C5A23f7B9bFa6844Bd2435f9124790";
     await nft.transferFrom(deployer.address, to, 0);
 
-    console.log("token 0's owner: ", await nft.ownerOf(0))     // 查看该nft的当前拥有者地址
+    console.log("token 0's owner: ", await nft.ownerOf(0));     // 查看该nft的当前拥有者地址
  
 }
 

@@ -10,7 +10,11 @@ module.exports = {
     goerli: {
       url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [SECRET_KEY]
-    }
+    },
+    pioneer: {
+      url: "https://rpc.pioneer.etm.network/",
+      accounts: [SECRET_KEY]
+    },
   }
 };
 
