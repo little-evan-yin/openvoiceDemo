@@ -10,8 +10,9 @@ interface IOpenVoiceNFT {
     ) external;
 
     function royaltyInfo(uint256 _tokenId, uint256 _salePrice) view external returns (address, uint256);
-}
 
+    function getPriceInfo(uint256 tokenId) view external returns (uint256);
+}
 
 contract FulfillOrder {
     address platformAddress;
@@ -32,6 +33,7 @@ contract FulfillOrder {
         uint256 tokenId,
         bytes memory _data
     ) public payable {
+        require(msg.value >= nftContract.getPriceInfo(tokenId), "Didn't pay enough money");
         (address royaltyReceiver, uint256 royalty) = nftContract.royaltyInfo(tokenId, msg.value);
         nftContract.safeTransferFrom(from, to, tokenId, _data);
         // token transfer

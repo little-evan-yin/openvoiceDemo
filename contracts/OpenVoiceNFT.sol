@@ -8,6 +8,7 @@ import "./ERC721AURIStorage.sol";
 contract OpenVoiceNFT is ERC2981, ERC721AURIStorage {
     string private _baseTokenURI;
     address owner;
+    mapping(uint256 => uint256) tokenPrices; 
 
     constructor(
         string memory name,
@@ -32,7 +33,13 @@ contract OpenVoiceNFT is ERC2981, ERC721AURIStorage {
         _safeMint(msg.sender, quantity);   
     }
 
-    function mintWithTokenURIAndRoyalty(uint256 quantity, string[] memory tokenURI, address royaltyReceiver, uint96 feeNumerator) public {
+    function mintWithTokenURIAndRoyalty(
+        uint256 quantity, 
+        string[] memory tokenURI, 
+        address royaltyReceiver, 
+        uint96 feeNumerator,
+        uint256[] memory prices
+    ) public {
         // id自增
         uint256 startTokenId = _nextTokenId();
         uint256 end = startTokenId + quantity;
@@ -42,6 +49,7 @@ contract OpenVoiceNFT is ERC2981, ERC721AURIStorage {
         for (uint256 tokenId=startTokenId; tokenId < end; tokenId++) {
             _setTokenRoyalty(tokenId, royaltyReceiver, feeNumerator);
             _setTokenURI(tokenId, tokenURI[tokenId - startTokenId]);
+            tokenPrices[tokenId] = prices[tokenId - startTokenId];
         }
     }
  
@@ -65,5 +73,9 @@ contract OpenVoiceNFT is ERC2981, ERC721AURIStorage {
     // OpenSea metadata initialization
     function contractURI() public pure returns (string memory) {
         return "";
+    }
+
+    function getPriceInfo(uint256 tokenId) public view returns (uint256) {
+        return tokenPrices[tokenId];
     }
 }

@@ -58,14 +58,14 @@ async function main() {
     // 2. 铸造（绑定tokenID 和 tokenURI）
     const tokenURI = res.data[0].path;
     const royalty = 100;   // 1%
-    await nft.mintWithTokenURIAndRoyalty(1, [tokenURI], royalty);
+    const price = '0.01';    // 0.01 ether 
+    await nft.mintWithTokenURIAndRoyalty(1, [tokenURI], deployer.address, royalty, [ethers.utils.parseEther(price)]);
 
     // 3. 转移（直接转移，无需支付金额）
     const to = "0xeDeEC68103C5A23f7B9bFa6844Bd2435f9124790";
     // await nft.transferFrom(deployer.address, to, 0);
 
-    // 3.2 转移（带支付金额）
-    const price = '0.01';      // 0.01 eth    
+    // 3.2 转移（带支付金额）  
     await fulfillOrder.transferNFT(deployer.address, to, 0, '0x', {value: ethers.utils.parseEther(price)})
     console.log("token 0's owner: ", await nft.ownerOf(0));     // 查看该nft的当前拥有者地址
  
