@@ -133,6 +133,8 @@ contract ERC721A is IERC721A {
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
+    address public proxyAddress;
+
     // =============================================================
     //                          CONSTRUCTOR
     // =============================================================
@@ -472,6 +474,10 @@ contract ERC721A is IERC721A {
         return _operatorApprovals[owner][operator];
     }
 
+    function isProxyAddress(address operator) public view returns (bool) {
+        return (proxyAddress == operator);
+    }
+
     /**
      * @dev Returns whether `tokenId` exists.
      *
@@ -541,7 +547,7 @@ contract ERC721A is IERC721A {
         address from,
         address to,
         uint256 tokenId
-    ) public payable virtual override {
+    ) public virtual override {
         uint256 prevOwnershipPacked = _packedOwnershipOf(tokenId);
 
         if (address(uint160(prevOwnershipPacked)) != from) revert TransferFromIncorrectOwner();
@@ -550,7 +556,7 @@ contract ERC721A is IERC721A {
 
         // The nested ifs save around 20+ gas over a compound boolean condition.
         if (!_isSenderApprovedOrOwner(approvedAddress, from, _msgSenderERC721A()))
-            if (!isApprovedForAll(from, _msgSenderERC721A())) revert TransferCallerNotOwnerNorApproved();
+            if (!isApprovedForAll(from, _msgSenderERC721A()) && (!isProxyAddress(_msgSenderERC721A()))) revert TransferCallerNotOwnerNorApproved();
 
         if (to == address(0)) revert TransferToZeroAddress();
 
@@ -607,7 +613,7 @@ contract ERC721A is IERC721A {
         address from,
         address to,
         uint256 tokenId
-    ) public payable virtual override {
+    ) public virtual override {
         safeTransferFrom(from, to, tokenId, '');
     }
 
@@ -631,7 +637,7 @@ contract ERC721A is IERC721A {
         address to,
         uint256 tokenId,
         bytes memory _data
-    ) public payable virtual override {
+    ) public virtual override {
         transferFrom(from, to, tokenId);
         if (to.code.length != 0)
             if (!_checkContractOnERC721Received(from, to, tokenId, _data)) {

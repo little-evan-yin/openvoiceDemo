@@ -6,10 +6,21 @@ async function main() {
     console.log(deployer.address)
 
     // 合约部署
+    // 1. NFT 合约
     const NFT = await ethers.getContractFactory("OpenVoiceNFT");
     const baseURI = "";
     const nft = await NFT.deploy("Open Voice", "OpenVoice", baseURI);
-    console.log("OpenVoiceNFT address: ", nft.address)    
+    console.log("OpenVoiceNFT contract address: ", nft.address)    
+
+    // 2. 销售 合约
+    const FulfillOrder = await ethers.getContractFactory("FulfillOrder");
+    const platformAddress = "0xdE76DB43d8C215Ba74231cb0062001ADa0750c46";
+    const platformFee = 2000;    // 20%
+    const fulfillOrder = await FulfillOrder.deploy(nft.address, platformAddress, platformFee);
+    console.log("FulfillOrder contract address: ", fulfillOrder.address)
+
+    // 设置代理地址（节省gas）
+    await nft.setProxyAddress(fulfillOrder.address);
 
     // 铸造nft
     // 1. 上传metadata到ipfs（使用moralis api）
@@ -44,14 +55,18 @@ async function main() {
     const res = await axios(options);
     console.log(res.data);
 
-    const tokenURI = res.data[0].path;
     // 2. 铸造（绑定tokenID 和 tokenURI）
-    await nft.mintWithTokenURIAndRoyalty(1, [tokenURI], 100);
+    const tokenURI = res.data[0].path;
+    const royalty = 100;   // 1%
+    await nft.mintWithTokenURIAndRoyalty(1, [tokenURI], royalty);
 
-    // 3. 转移
+    // 3. 转移（直接转移，无需支付金额）
     const to = "0xeDeEC68103C5A23f7B9bFa6844Bd2435f9124790";
-    await nft.transferFrom(deployer.address, to, 0);
+    // await nft.transferFrom(deployer.address, to, 0);
 
+    // 3.2 转移（带支付金额）
+    const price = '0.01';      // 0.01 eth    
+    await fulfillOrder.transferNFT(deployer.address, to, 0, '0x', {value: ethers.utils.parseEther(price)})
     console.log("token 0's owner: ", await nft.ownerOf(0));     // 查看该nft的当前拥有者地址
  
 }

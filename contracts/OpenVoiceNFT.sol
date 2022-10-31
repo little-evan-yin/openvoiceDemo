@@ -7,6 +7,7 @@ import "./ERC721AURIStorage.sol";
 
 contract OpenVoiceNFT is ERC2981, ERC721AURIStorage {
     string private _baseTokenURI;
+    address owner;
 
     constructor(
         string memory name,
@@ -15,6 +16,12 @@ contract OpenVoiceNFT is ERC2981, ERC721AURIStorage {
     ) ERC721A(name, symbol) {
         _baseTokenURI = baseTokenURI;
         _setDefaultRoyalty(msg.sender, 100);      // default royalty for all nfts, 100 means 1%
+        owner = msg.sender;
+    }
+
+    function setProxyAddress(address _proxyAddress) external {
+        require(msg.sender == owner, "Forbidden: not allowed!");
+        proxyAddress = _proxyAddress;
     }
 
     function _baseURI() internal view virtual override returns (string memory) {

@@ -170,7 +170,7 @@ interface IERC721A {
         address to,
         uint256 tokenId,
         bytes calldata data
-    ) external payable;
+    ) external;
 
     /**
      * @dev Equivalent to `safeTransferFrom(from, to, tokenId, '')`.
@@ -179,7 +179,7 @@ interface IERC721A {
         address from,
         address to,
         uint256 tokenId
-    ) external payable;
+    ) external;
 
     /**
      * @dev Transfers `tokenId` from `from` to `to`.
@@ -201,7 +201,7 @@ interface IERC721A {
         address from,
         address to,
         uint256 tokenId
-    ) external payable;
+    ) external;
 
     /**
      * @dev Gives permission to `to` to transfer `tokenId` token to another account.
